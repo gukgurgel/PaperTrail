@@ -45,3 +45,26 @@ export default function Header() {
     </nav>
   );
 }
+
+function ChatButton() {
+  const { context } = useChat();
+  
+  const handleChatClick = () => {
+    // Trigger the chat widget to open
+    const chatButton = document.querySelector('[data-chat-trigger]') as HTMLButtonElement;
+    if (chatButton) {
+      chatButton.click();
+    }
+  };
+  
+  return (
+    <button 
+      onClick={handleChatClick}
+      className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
+      title="Chat with AI Assistant"
+    >
+      <ChatIcon className="w-5 h-5" />
+      <span className="text-sm font-medium hidden sm:inline">AI Chat</span>
+    </button>
+  );
+}
