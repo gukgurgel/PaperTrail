@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import ChatWidget from './ChatWidget';
 import { useChatContext } from '@/lib/hooks/useChatContext';
 
@@ -8,6 +8,10 @@ interface ChatContextType {
   context: any;
   updateContext: (newContext: any) => void;
   clearContext: () => void;
+  isOpen: boolean;
+  openChat: () => void;
+  closeChat: () => void;
+  toggleChat: () => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -26,11 +30,28 @@ interface ChatProviderProps {
 
 export default function ChatProvider({ children }: ChatProviderProps) {
   const chatContext = useChatContext();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openChat = () => setIsOpen(true);
+  const closeChat = () => setIsOpen(false);
+  const toggleChat = () => setIsOpen(!isOpen);
+
+  const value = {
+    ...chatContext,
+    isOpen,
+    openChat,
+    closeChat,
+    toggleChat,
+  };
 
   return (
-    <ChatContext.Provider value={chatContext}>
+    <ChatContext.Provider value={value}>
       {children}
-      <ChatWidget context={chatContext.context} />
+      <ChatWidget 
+        context={chatContext.context} 
+        isOpen={isOpen}
+        onClose={closeChat}
+      />
     </ChatContext.Provider>
   );
 }

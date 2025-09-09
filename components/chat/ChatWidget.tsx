@@ -19,10 +19,17 @@ interface Message {
 interface ChatWidgetProps {
   context?: any;
   className?: string;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export default function ChatWidget({ context, className = '' }: ChatWidgetProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function ChatWidget({ 
+  context, 
+  className = '', 
+  isOpen: externalIsOpen,
+  onClose 
+}: ChatWidgetProps) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -35,6 +42,12 @@ export default function ChatWidget({ context, className = '' }: ChatWidgetProps)
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Use external isOpen state if provided, otherwise use internal state
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = onClose ? 
+    (open: boolean) => { if (!open) onClose(); } : 
+    setInternalIsOpen;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -65,6 +78,12 @@ export default function ChatWidget({ context, className = '' }: ChatWidgetProps)
     setIsLoading(true);
 
     try {
+      // Prepare conversation history (excluding the welcome message for API)
+      const conversationHistory = messages.slice(1).map(msg => ({
+        text: msg.text,
+        isUser: msg.isUser
+      }));
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -73,6 +92,7 @@ export default function ChatWidget({ context, className = '' }: ChatWidgetProps)
         body: JSON.stringify({
           message: userMessage.text,
           context: context,
+          conversationHistory: conversationHistory,
         }),
       });
 

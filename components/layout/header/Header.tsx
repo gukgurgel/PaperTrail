@@ -35,7 +35,7 @@ export default function Header() {
 }
 
 function ChatButton() {
-  const { context } = useChat();
+  const { context, openChat } = useChat();
   
   const handleChatClick = () => {
     // Trigger the chat widget to open
@@ -46,7 +46,7 @@ function ChatButton() {
   };
   
   return (
-    <button 
+    <button
       onClick={handleChatClick}
       className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
       title="Chat with AI Assistant"

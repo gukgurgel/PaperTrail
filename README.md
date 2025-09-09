@@ -1,4 +1,4 @@
-# MigrateAI 🌍✈️
+# PaperTrail 🌍✈️
 
 *Your Immigration Journey, Enhanced with AI*
 
@@ -134,7 +134,7 @@ Google Gemini 2.5 Flash
 
 ```bash
 # Clone the repository
-git clone https://github.com/gukgurgel/migrate-ai
+git clone https://github.com/Hajuj/PaperTrail.git
 
 # Install dependencies
 npm install
