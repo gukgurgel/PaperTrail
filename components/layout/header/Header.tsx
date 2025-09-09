@@ -4,9 +4,14 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChatBubbleLeftRightIcon as ChatIcon } from '@heroicons/react/24/outline';
-import { useChat } from '@/components/chat/ChatProvider';
 
 export default function Header() {
+  const handleChatClick = () => {
+    // Dispatch a custom event to trigger the chat widget
+    const chatEvent = new CustomEvent('toggleChat');
+    window.dispatchEvent(chatEvent);
+  };
+
   return (
     <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,7 +28,14 @@ export default function Header() {
                      <Link href="/timeline" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition">
                        Timeline
                      </Link>
-                     <ChatButton />
+                     <button 
+                       onClick={handleChatClick}
+                       className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
+                       title="Chat with AI Assistant"
+                     >
+                       <ChatIcon className="w-5 h-5" />
+                       <span className="text-sm font-medium hidden sm:inline">AI Chat</span>
+                     </button>
                      <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
                        Get Started
                      </button>
@@ -31,28 +43,5 @@ export default function Header() {
         </div>
       </div>
     </nav>
-  );
-}
-
-function ChatButton() {
-  const { context } = useChat();
-  
-  const handleChatClick = () => {
-    // Trigger the chat widget to open
-    const chatButton = document.querySelector('[data-chat-trigger]') as HTMLButtonElement;
-    if (chatButton) {
-      chatButton.click();
-    }
-  };
-  
-  return (
-    <button 
-      onClick={handleChatClick}
-      className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
-      title="Chat with AI Assistant"
-    >
-      <ChatIcon className="w-5 h-5" />
-      <span className="text-sm font-medium hidden sm:inline">AI Chat</span>
-    </button>
   );
 }

@@ -50,6 +50,19 @@ export default function ChatWidget({ context, className = '' }: ChatWidgetProps)
     }
   }, [isOpen]);
 
+  // Listen for chat toggle events from header
+  useEffect(() => {
+    const handleToggleChat = () => {
+      setIsOpen(prev => !prev);
+    };
+
+    window.addEventListener('toggleChat', handleToggleChat);
+    
+    return () => {
+      window.removeEventListener('toggleChat', handleToggleChat);
+    };
+  }, []);
+
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
