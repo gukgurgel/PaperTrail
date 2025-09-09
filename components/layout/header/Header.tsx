@@ -30,10 +30,11 @@ export default function Header() {
 }
 
 function ChatButton() {
-  const { context } = useChat();
+  const { context, openChat } = useChat();
   
   return (
     <button 
+      onClick={openChat}
       className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
       title="Chat with AI Assistant"
     >

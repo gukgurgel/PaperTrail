@@ -19,10 +19,17 @@ interface Message {
 interface ChatWidgetProps {
   context?: any;
   className?: string;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export default function ChatWidget({ context, className = '' }: ChatWidgetProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function ChatWidget({ 
+  context, 
+  className = '', 
+  isOpen: externalIsOpen,
+  onClose 
+}: ChatWidgetProps) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -35,6 +42,12 @@ export default function ChatWidget({ context, className = '' }: ChatWidgetProps)
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Use external isOpen state if provided, otherwise use internal state
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = onClose ? 
+    (open: boolean) => { if (!open) onClose(); } : 
+    setInternalIsOpen;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -65,6 +78,12 @@ export default function ChatWidget({ context, className = '' }: ChatWidgetProps)
     setIsLoading(true);
 
     try {
+      // Prepare conversation history (excluding the welcome message for API)
+      const conversationHistory = messages.slice(1).map(msg => ({
+        text: msg.text,
+        isUser: msg.isUser
+      }));
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -73,6 +92,7 @@ export default function ChatWidget({ context, className = '' }: ChatWidgetProps)
         body: JSON.stringify({
           message: userMessage.text,
           context: context,
+          conversationHistory: conversationHistory,
         }),
       });
 
@@ -126,7 +146,7 @@ export default function ChatWidget({ context, className = '' }: ChatWidgetProps)
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setIsOpen(true)}
+            onClick={() => externalIsOpen === undefined ? setInternalIsOpen(true) : undefined}
             className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200"
           >
             <ChatIcon className="w-6 h-6" />
