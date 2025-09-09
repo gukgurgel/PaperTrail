@@ -22,6 +22,33 @@ type GanttChartProps = {
   totalWeeks?: number;
 };
 
+// Helper function to truncate text
+const truncateText = (text: string, maxLength: number = 65): string => {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength).trim() + '...';
+};
+
+// Static stage names mapping
+const getStaticStageName = (taskId: string): string => {
+  const mapping: { [key: string]: string } = {
+    'visa': 'Visa Application',
+    'insurance': 'Health Insurance', 
+    'bank': 'Bank Account',
+    'proof': 'Proof of Income',
+    'flight': 'Flight Booking',
+  };
+  
+  // Extract base ID (remove any suffix after dash)
+  const baseId = taskId.split('-')[0];
+  return mapping[baseId] || taskId;
+};
+
+// Helper function to check if bar is wide enough for internal dates
+const isBarWideEnough = (widthPercent: number, containerWidth: number = 800): boolean => {
+  const barWidth = (widthPercent / 100) * containerWidth;
+  return barWidth >= 120;
+};
+
 const GanttChart: React.FC<GanttChartProps> = ({ 
   tasks, 
   onTaskClick,
@@ -70,6 +97,8 @@ const GanttChart: React.FC<GanttChartProps> = ({
     return {
       left: `${leftPercent}%`,
       width: `${widthPercent}%`,
+      leftPercent,
+      widthPercent,
     };
   };
 
@@ -102,7 +131,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
       {/* Timeline Header */}
       <div className="mb-4">
         <div className="flex">
-          <div className="w-64 flex-shrink-0"></div> {/* Spacer for task labels */}
+          <div className="w-80 flex-shrink-0"></div> {/* Increased width for better text display */}
           <div className="flex-1 relative">
             <div className="flex">
               {weekLabels.map((week, index) => (
@@ -123,11 +152,12 @@ const GanttChart: React.FC<GanttChartProps> = ({
       </div>
 
       {/* Tasks */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         {tasks.map((task, index) => {
           const position = getTaskPosition(task);
           const color = getTaskColor(task.status);
           const textColor = getTaskTextColor(task.status);
+          const barWideEnough = isBarWideEnough(position.widthPercent);
           
           return (
             <motion.div
@@ -135,46 +165,70 @@ const GanttChart: React.FC<GanttChartProps> = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="flex items-center h-16"
+              className="flex items-start h-20" // Increased height for better text display
             >
               {/* Task Label */}
-              <div className="w-64 flex-shrink-0 pr-4">
+              <div className="w-80 flex-shrink-0 pr-4">
                 <div 
-                  className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200"
+                  className="cursor-pointer hover:bg-gray-50 rounded-lg p-3 transition-colors duration-200"
                   onClick={() => onTaskClick?.(task)}
                 >
-                  <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: color }}
-                  />
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900">{task.title}</h3>
-                    <p className="text-xs text-gray-600">{task.description}</p>
+                  <div className="flex items-start space-x-3">
+                    <div 
+                      className="w-3 h-3 rounded-full mt-1 flex-shrink-0"
+                      style={{ backgroundColor: color }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">{getStaticStageName(task.id)}</h3>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        {truncateText(task.description, 65)}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Timeline Area */}
-              <div className="flex-1 relative h-12 bg-gray-100 rounded-lg overflow-hidden">
+              <div className="flex-1 relative h-16 bg-gray-100 rounded-lg overflow-hidden">
                 {/* Task Bar */}
                 <motion.div
-                  className="absolute h-12 rounded-lg transition-all duration-200 flex items-center justify-between px-3"
+                  className="absolute h-16 rounded-lg transition-all duration-200"
                   style={{
                     left: position.left,
                     width: position.width,
                     backgroundColor: color,
-                    color: textColor,
                   }}
                   onMouseEnter={() => setHoveredTask(task)}
                   onMouseLeave={() => setHoveredTask(null)}
                 >
-                  <div className="text-xs font-medium truncate">
-                    {task.title}
-                  </div>
-                  <div className="text-xs opacity-80 ml-2">
-                    {format(task.startDate, 'MMM d')} - {format(task.endDate, 'MMM d')}
-                  </div>
                 </motion.div>
+
+                {/* External Date Labels */}
+                <>
+                  {/* Start Date */}
+                  <div 
+                    className="absolute top-0 text-xs text-gray-500 bg-white px-1 rounded shadow-sm"
+                    style={{
+                      left: position.left,
+                      transform: 'translateY(-100%)',
+                      marginTop: '2px'
+                    }}
+                  >
+                    {format(task.startDate, 'MMM d')}
+                  </div>
+                  
+                  {/* End Date */}
+                  <div 
+                    className="absolute top-0 text-xs text-gray-500 bg-white px-1 rounded shadow-sm"
+                    style={{
+                      left: `calc(${position.left} + ${position.width})`,
+                      transform: 'translateX(-100%) translateY(-100%)',
+                      marginTop: '2px'
+                    }}
+                  >
+                    {format(task.endDate, 'MMM d')}
+                  </div>
+                </>
               </div>
 
               {/* Status Badge */}

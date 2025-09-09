@@ -146,7 +146,8 @@ export default function ChatWidget({
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => externalIsOpen === undefined ? setInternalIsOpen(true) : undefined}
+            onClick={() => setIsOpen(true)}
+            data-chat-trigger
             className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200"
           >
             <ChatIcon className="w-6 h-6" />
