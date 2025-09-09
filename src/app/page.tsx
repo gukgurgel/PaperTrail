@@ -425,18 +425,19 @@ export default function LandingPage() {
 			</section>
 
 			{/* Footer */}
-			<footer className="bg-gray-900 text-white py-12">
+			<footer className="text-white py-12 shadow-xl bg-gray-50">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="grid md:grid-cols-4 gap-8">
 						<div>
-							<div className="flex items-center space-x-2 mb-4">
-								<div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg"></div>
-								<span className="text-xl font-bold">PaperTrail</span>
-							</div>
+						<Link href="/" className="flex items-center">
+            <img className="w-32 h-32" 
+              src="/PaperTrailLogo.png" 
+              alt="PaperTrail Logo"             />
+          </Link>
 							<p className="text-gray-400">Making immigration simple, one step at a time.</p>
 						</div>
 						<div>
-							<h4 className="font-semibold mb-4">Product</h4>
+							<h4 className="font-semibold text-black mb-4">Product</h4>
 							<ul className="space-y-2 text-gray-400">
 								<li>
 									<a href="#" className="hover:text-white transition">
@@ -456,7 +457,7 @@ export default function LandingPage() {
 							</ul>
 						</div>
 						<div>
-							<h4 className="font-semibold mb-4">Support</h4>
+							<h4 className="font-semibold text-black mb-4">Support</h4>
 							<ul className="space-y-2 text-gray-400">
 								<li>
 									<a href="#" className="hover:text-white transition">
@@ -476,7 +477,7 @@ export default function LandingPage() {
 							</ul>
 						</div>
 						<div>
-							<h4 className="font-semibold mb-4">Company</h4>
+							<h4 className="font-semibold text-black mb-4">Company</h4>
 							<ul className="space-y-2 text-gray-400">
 								<li>
 									<a href="#" className="hover:text-white transition">
